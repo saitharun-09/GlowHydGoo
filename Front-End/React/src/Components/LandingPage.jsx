@@ -42,28 +42,61 @@ const ScissorsIcon = ({ className = 'w-5 h-5' }) => (
 
 
 /* ─── Navbar ─── */
-const Navbar = () => {
+const NAV_ITEMS = ['Home', 'Services', 'Salons', 'AI Stylist', 'Professionals', 'Offers'];
+const NAVIGABLE = ['Home', 'Salons']; // pages that have a route
+
+const Navbar = ({ activePage, onNavigate }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleNav = (item) => {
+    if (NAVIGABLE.includes(item)) {
+      onNavigate(item);
+      setMobileOpen(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const navLinkClass = (item) => {
+    const isActive = activePage === item;
+    return [
+      'text-sm font-medium transition-colors relative pb-0.5',
+      isActive
+        ? 'text-blue-600 after:absolute after:bottom-[-2px] after:left-0 after:right-0 after:h-0.5 after:bg-blue-600 after:rounded-full'
+        : 'text-gray-600 hover:text-blue-600',
+      NAVIGABLE.includes(item) ? 'cursor-pointer' : 'cursor-default',
+    ].join(' ');
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2" aria-label="GlowHyd home">
+          <button
+            onClick={() => handleNav('Home')}
+            className="flex items-center gap-2"
+            aria-label="GlowHyd home"
+          >
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
               <SparklesIcon className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900">
               Glow<span className="text-blue-600">Hyd</span>
             </span>
-          </a>
+          </button>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
-            {['Home', 'Services', 'Salons', 'AI Stylist', 'Professionals', 'Offers'].map(item => (
-              <a key={item} href="#" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
+            {NAV_ITEMS.map(item => (
+              <button
+                key={item}
+                onClick={() => handleNav(item)}
+                className={navLinkClass(item)}
+                aria-current={activePage === item ? 'page' : undefined}
+              >
                 {item}
-              </a>
+              </button>
             ))}
           </div>
 
@@ -94,13 +127,23 @@ const Navbar = () => {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-gray-100 py-4 flex flex-col gap-3">
-            {['Home', 'Services', 'Salons', 'AI Stylist', 'Professionals', 'Offers'].map(item => (
-              <a key={item} href="#" className="text-sm font-medium text-gray-700 hover:text-blue-600 px-2 py-1 transition-colors">
+          <div className="md:hidden border-t border-gray-100 py-4 flex flex-col gap-1">
+            {NAV_ITEMS.map(item => (
+              <button
+                key={item}
+                onClick={() => handleNav(item)}
+                className={[
+                  'text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full',
+                  activePage === item
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50',
+                ].join(' ')}
+                aria-current={activePage === item ? 'page' : undefined}
+              >
                 {item}
-              </a>
+              </button>
             ))}
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-3 pt-3 px-1">
               <a href="#" className="flex-1 text-center text-sm font-medium text-blue-600 border border-blue-200 px-4 py-2 rounded-lg">Become a Pro</a>
               <a href="#" className="flex-1 text-center text-sm font-medium text-white bg-blue-600 px-4 py-2 rounded-lg">Sign In</a>
             </div>
@@ -827,9 +870,9 @@ const Footer = () => (
 
 
 /* ─── Root Export ─── */
-const LandingPage = () => (
+const LandingPage = ({ activePage, onNavigate }) => (
   <div className="font-sans antialiased">
-    <Navbar />
+    <Navbar activePage={activePage} onNavigate={onNavigate} />
     <main>
       <HeroSection />
       <TrustBar />
